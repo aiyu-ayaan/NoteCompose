@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteDao {
 
-    @Query("SELECT * FROM notes_table WHERE isArchived == 0 ORDER BY isStared DESC, created DESC ")
+    @Query("SELECT * FROM notes_table WHERE isArchived == 0 ORDER BY isStared DESC ,updated DESC, created DESC ")
     fun getAllNotes(): Flow<List<Note>>
 
 
@@ -28,6 +28,6 @@ interface NoteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(notes: List<Note>)
 
-    @Delete
-    suspend fun delete(note: Note)
+    @Query("DELETE FROM notes_table WHERE id = :id")
+    suspend fun delete(id: Int)
 }

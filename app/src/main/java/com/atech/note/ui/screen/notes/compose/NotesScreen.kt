@@ -1,6 +1,7 @@
 package com.atech.note.ui.screen.notes.compose
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -36,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +56,6 @@ import com.atech.note.ui.theme.grid_0_5
 import com.atech.note.ui.theme.grid_1
 import com.atech.note.ui.theme.grid_2
 import com.atech.note.utils.Navigation
-import com.atech.note.utils.noteList
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -110,6 +112,14 @@ fun NotesScreen(
                 contentColor = MaterialTheme.colorScheme.primary,
             )
         }) {
+        if (notes.isEmpty()) {
+            EmptyScreen(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = it.calculateTopPadding())
+            )
+            return@Scaffold
+        }
         LazyColumn(
             modifier = Modifier.consumeWindowInsets(it),
             contentPadding = it,
@@ -189,6 +199,27 @@ fun NoteItem(
     }
 }
 
+@Composable
+fun EmptyScreen(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            modifier = Modifier.size(200.dp),
+            painter = painterResource(id = R.drawable.im_empty),
+            contentDescription = "Empty"
+        )
+        Text(
+            text = "Press + to add note",
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
+        )
+    }
+}
 
 @Composable
 @Preview(
@@ -197,7 +228,7 @@ fun NoteItem(
 fun NotesScreenPreview() {
     NoteComposeTheme {
         Surface {
-            NotesScreen()
+            EmptyScreen()
         }
     }
 }

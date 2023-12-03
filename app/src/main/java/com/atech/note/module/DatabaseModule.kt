@@ -22,14 +22,14 @@ object DatabaseModule {
     @Singleton
     fun provideNoteDao(
         @ApplicationContext context: Context,
-        callback: NoteDatabase.NoteDatabaseCallback
+        /*callback: NoteDatabase.NoteDatabaseCallback*/
     ): NoteDatabase =
         Room.databaseBuilder(
             context,
             NoteDatabase::class.java,
             NoteDatabase.DATABASE_NAME
         )
-            .addCallback(callback)
+            /*.addCallback(callback)*/
             .fallbackToDestructiveMigration()
             .build()
 

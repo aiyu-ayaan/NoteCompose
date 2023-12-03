@@ -47,7 +47,7 @@ data class InsertNote @Inject constructor(
 data class DeleteNote @Inject constructor(
     private val dao: NoteDao
 ) {
-    suspend operator fun invoke(note: Note) {
-        dao.delete(note)
+    suspend operator fun invoke(id: Int) {
+        dao.delete(id)
     }
 }

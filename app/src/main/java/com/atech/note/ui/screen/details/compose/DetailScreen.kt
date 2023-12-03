@@ -1,5 +1,6 @@
 package com.atech.note.ui.screen.details.compose
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,14 +21,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,8 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.atech.note.ui.screen.details.DetailScreenEvent
 import com.atech.note.ui.screen.details.DetailViewModel
+import com.atech.note.ui.screen.details.TextFieldState
 import com.atech.note.ui.theme.captionColor
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,24 +60,40 @@ fun DetailScreen(
     val body = viewModel.body.value
     val topAppbarState = viewModel.topBarState.value
     val createOrUpdateAtState = viewModel.createdOrUpdatedAt.value
+    val snackBarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { uiEvent ->
+            when (uiEvent) {
+                is DetailViewModel.UiEvent.ShowSnackBar -> snackBarHostState.showSnackbar(
+                    uiEvent.message
+                )
+            }
+        }
+    }
+
+    HandleBackPress(title, body, viewModel, navController)
     Scaffold(
-        modifier =
-        modifier
+        modifier = modifier
             .fillMaxSize()
             .nestedScroll(scrollBarBehavior.nestedScrollConnection),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = viewModel.type)
+                    Text(text = viewModel.type.value)
                 },
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigateUp()
+                            handleBackPress(
+                                title = title.text,
+                                body = body.text,
+                                viewModel = viewModel,
+                                navController = navController
+                            )
                         },
-                    )
-                    {
+                    ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
@@ -77,28 +102,38 @@ fun DetailScreen(
                 },
                 actions = {
                     IconButton(
-                        onClick = { /*TODO Handle isStared*/ },
-                    )
-                    {
+                        onClick = {
+                            viewModel.onEvent(
+                                DetailScreenEvent.ChangeTopBarState(
+                                    Pair(topAppbarState.first, !topAppbarState.second)
+                                )
+                            )
+                        },
+                    ) {
                         Icon(
-                            imageVector =
-                            if (topAppbarState.second) Icons.Default.Star else Icons.Outlined.StarBorder,
+                            imageVector = if (topAppbarState.second) Icons.Default.Star else Icons.Outlined.StarBorder,
                             contentDescription = "Back",
                         )
                     }
                     IconButton(
-                        onClick = { /*TODO Handle isArchive*/ },
-                    )
-                    {
+                        onClick = {
+                            viewModel.onEvent(
+                                DetailScreenEvent.ChangeTopBarState(
+                                    Pair(!topAppbarState.first, topAppbarState.second)
+                                )
+                            )
+                        },
+                    ) {
                         Icon(
                             imageVector = if (topAppbarState.first) Icons.Default.Archive else Icons.Outlined.Archive,
                             contentDescription = "Back",
                         )
                     }
-                    IconButton(onClick = { /*TODO Handle delete*/ }) {
+                    if (viewModel.type == DetailViewModel.Type.EDIT) IconButton(onClick = {
+                        viewModel.onEvent(DetailScreenEvent.DeleteNote(action = { navController.navigateUp() }))
+                    }) {
                         Icon(
-                            imageVector = Icons.Outlined.Delete,
-                            contentDescription = "Delete"
+                            imageVector = Icons.Outlined.Delete, contentDescription = "Delete"
                         )
                     }
                 },
@@ -139,8 +174,14 @@ fun DetailScreen(
                 hint = title.hint,
                 singleLine = false,
                 isHintVisible = title.isHintVisible,
-                onValueChange = { /*TODO Handle title change*/ },
-                onFocusChange = { /*TODO Handle title focus*/ },
+                onValueChange = { title ->
+                    viewModel.onEvent(DetailScreenEvent.EnteredTitle(title))
+                },
+                onFocusChange = { focusState ->
+                    viewModel.onEvent(
+                        DetailScreenEvent.ChangeTitleFocus(focusState)
+                    )
+                },
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth(),
@@ -152,8 +193,14 @@ fun DetailScreen(
                 hint = body.hint,
                 singleLine = false,
                 isHintVisible = body.isHintVisible,
-                onValueChange = { /*TODO Handle title change*/ },
-                onFocusChange = { /*TODO Handle title focus*/ },
+                onValueChange = { body ->
+                    viewModel.onEvent(DetailScreenEvent.EnteredBody(body))
+                },
+                onFocusChange = { focusState ->
+                    viewModel.onEvent(
+                        DetailScreenEvent.ChangeBodyFocus(focusState)
+                    )
+                },
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth(),
@@ -162,6 +209,30 @@ fun DetailScreen(
 
         }
     }
+}
+
+@Composable
+private fun HandleBackPress(
+    title: TextFieldState,
+    body: TextFieldState,
+    viewModel: DetailViewModel,
+    navController: NavController
+) {
+    BackHandler {
+        handleBackPress(
+            title = title.text,
+            body = body.text,
+            viewModel = viewModel,
+            navController = navController
+        )
+    }
+}
+
+private fun handleBackPress(
+    title: String, body: String, viewModel: DetailViewModel, navController: NavController
+) {
+    if (title.isNotEmpty() || body.isNotEmpty()) viewModel.onEvent(DetailScreenEvent.SaveNote(action = { navController.navigateUp() }))
+    else navController.navigateUp()
 }
 
 @Composable
@@ -177,17 +248,20 @@ fun EditTextField(
 ) {
     Box(modifier) {
         BasicTextField(
-            modifier = Modifier
-                .onFocusChanged(onFocusChange),
+            modifier = Modifier.onFocusChanged(onFocusChange),
             value = text,
             onValueChange = onValueChange,
             textStyle = textStyle.copy(
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
             singleLine = singleLine
         )
-        if (isHintVisible)
-            Text(text = hint, style = textStyle, color = textStyle.color.copy(alpha = 0.5f))
+        if (isHintVisible) Text(
+            text = hint,
+            style = textStyle,
+            color = MaterialTheme.colorScheme.captionColor
+        )
     }
 }
 
