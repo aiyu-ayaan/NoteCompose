@@ -1,10 +1,11 @@
-package com.atech.note.ui.screen.notes
+package com.atech.note.ui.screen.notes.compose
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,6 +45,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.atech.note.R
 import com.atech.note.data.database.model.Note
+import com.atech.note.ui.screen.notes.NoteViewModel
 import com.atech.note.ui.theme.NoteComposeTheme
 import com.atech.note.ui.theme.borderColor
 import com.atech.note.ui.theme.captionColor
@@ -49,6 +53,7 @@ import com.atech.note.ui.theme.grid_0_5
 import com.atech.note.ui.theme.grid_1
 import com.atech.note.ui.theme.grid_2
 import com.atech.note.utils.Navigation
+import com.atech.note.utils.noteList
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -96,7 +101,8 @@ fun NotesScreen(
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.tertiary
+                            tint = MaterialTheme.colorScheme.surface
+
                         )
                     }
                 },
@@ -147,13 +153,28 @@ fun NoteItem(
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = note.title,
-                modifier = Modifier
-                    .padding(horizontal = grid_2, vertical = grid_0_5),
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.titleLarge
-            )
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = note.title,
+                    modifier = Modifier
+                        .padding(horizontal = grid_2, vertical = grid_0_5),
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                IconButton(onClick = {
+                    /*TODO Handle star*/
+                }) {
+                    Icon(
+                        imageVector = if (note.isStared) Icons.Default.Star else Icons.Outlined.StarBorder,
+                        contentDescription = "Star",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
             Spacer(modifier = Modifier.padding(top = grid_1))
             Text(
                 text = note.body,

@@ -12,8 +12,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.atech.note.ui.screen.details.DetailScreen
-import com.atech.note.ui.screen.notes.NotesScreen
+import com.atech.note.ui.screen.details.compose.DetailScreen
+import com.atech.note.ui.screen.notes.compose.NotesScreen
 import com.atech.note.ui.theme.NoteComposeTheme
 import com.atech.note.utils.Navigation
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,7 +48,9 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         ) {
-                            DetailScreen()
+                            DetailScreen(
+                                navController = navController
+                            )
                         }
                     }
                 }

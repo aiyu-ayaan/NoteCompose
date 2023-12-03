@@ -1,9 +1,12 @@
 package com.atech.note.data.database.model
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "notes_table")
+@Parcelize
 data class Note(
     val title: String,
     val body: String,
@@ -13,4 +16,4 @@ data class Note(
     val isArchived: Boolean = false,
     @PrimaryKey(autoGenerate = true)
     val id: Int? = null
-)
+) : Parcelable

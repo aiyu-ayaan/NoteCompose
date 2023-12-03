@@ -1,4 +1,4 @@
-package com.atech.note.ui.screen.details
+package com.atech.note.ui.screen.details.compose
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,27 +29,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.atech.note.R
-import com.atech.note.data.database.model.Note
+import com.atech.note.ui.screen.details.DetailViewModel
 import com.atech.note.ui.theme.captionColor
-import com.atech.note.utils.getTimeAgo
-import com.atech.note.utils.noteDemo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     modifier: Modifier = Modifier,
+    viewModel: DetailViewModel = hiltViewModel(),
     navController: NavController = rememberNavController(),
 ) {
     val scrollState = rememberScrollState()
     val scrollBarBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val note = noteDemo
+    val title = viewModel.title.value
+    val body = viewModel.body.value
+    val topAppbarState = viewModel.topBarState.value
+    val createOrUpdateAtState = viewModel.createdOrUpdatedAt.value
 
     Scaffold(
         modifier =
@@ -59,12 +60,12 @@ fun DetailScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = "Edit")
+                    Text(text = viewModel.type)
                 },
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                                  navController.navigateUp()
+                            navController.navigateUp()
                         },
                     )
                     {
@@ -81,7 +82,7 @@ fun DetailScreen(
                     {
                         Icon(
                             imageVector =
-                            if (note.isStared) Icons.Default.Star else Icons.Outlined.StarBorder,
+                            if (topAppbarState.second) Icons.Default.Star else Icons.Outlined.StarBorder,
                             contentDescription = "Back",
                         )
                     }
@@ -90,7 +91,7 @@ fun DetailScreen(
                     )
                     {
                         Icon(
-                            imageVector = if (note.isArchived) Icons.Default.Archive else Icons.Outlined.Archive,
+                            imageVector = if (topAppbarState.first) Icons.Default.Archive else Icons.Outlined.Archive,
                             contentDescription = "Back",
                         )
                     }
@@ -116,8 +117,7 @@ fun DetailScreen(
 
             ) {
                 Text(
-                    text = if (note.updated != null) "Last Edit ${note.updated.getTimeAgo()}"
-                    else "Created ${note.created.getTimeAgo()}",
+                    text = createOrUpdateAtState,
                     modifier = Modifier
                         .padding(16.dp)
                         .align(Alignment.Center),
@@ -135,10 +135,10 @@ fun DetailScreen(
         ) {
 
             EditTextField(
-                text = note.title,
-                hint = stringResource(id = R.string.enter_title),
+                text = title.text,
+                hint = title.hint,
                 singleLine = false,
-                isHintVisible = false,
+                isHintVisible = title.isHintVisible,
                 onValueChange = { /*TODO Handle title change*/ },
                 onFocusChange = { /*TODO Handle title focus*/ },
                 modifier = Modifier
@@ -148,10 +148,10 @@ fun DetailScreen(
             )
 
             EditTextField(
-                text = note.body,
-                hint = stringResource(id = R.string.enter_body),
+                text = body.text,
+                hint = body.hint,
                 singleLine = false,
-                isHintVisible = false,
+                isHintVisible = body.isHintVisible,
                 onValueChange = { /*TODO Handle title change*/ },
                 onFocusChange = { /*TODO Handle title focus*/ },
                 modifier = Modifier

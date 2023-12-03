@@ -28,7 +28,7 @@ data class GetArchivedNotes @Inject constructor(
 data class GetNoteById @Inject constructor(
     private val dao: NoteDao
 ) {
-    operator fun invoke(id: Int) = dao.getNoteById(id)
+    suspend operator fun invoke(id: Int) = dao.getNoteById(id)
 }
 
 data class InsertNote @Inject constructor(
