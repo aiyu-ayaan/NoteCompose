@@ -1,7 +1,7 @@
 package com.atech.note.utils
 
 import android.annotation.SuppressLint
-import com.atech.note.data.model.Note
+import com.atech.note.data.database.model.Note
 
 
 @SuppressLint("SimpleDateFormat")

@@ -1,4 +1,4 @@
-package com.atech.note.data.model
+package com.atech.note.data.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

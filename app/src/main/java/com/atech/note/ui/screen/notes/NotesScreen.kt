@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
@@ -38,23 +37,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.atech.note.R
-import com.atech.note.data.model.Note
+import com.atech.note.data.database.model.Note
 import com.atech.note.ui.theme.NoteComposeTheme
 import com.atech.note.ui.theme.borderColor
 import com.atech.note.ui.theme.captionColor
 import com.atech.note.ui.theme.grid_0_5
 import com.atech.note.ui.theme.grid_1
 import com.atech.note.ui.theme.grid_2
-import com.atech.note.utils.noteList
+import com.atech.note.utils.Navigation
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NotesScreen(
     modifier: Modifier = Modifier,
+    viewModel: NoteViewModel = hiltViewModel(),
+    navController: NavController = rememberNavController()
 ) {
     val scrollBarBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    Scaffold(modifier = Modifier
+    val notes = viewModel.notes.value
+    Scaffold(modifier = modifier
         .fillMaxSize()
         .nestedScroll(scrollBarBehavior.nestedScrollConnection),
         topBar = {
@@ -83,7 +88,9 @@ fun NotesScreen(
                 },
                 floatingActionButton = {
                     FloatingActionButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            navController.navigate(Navigation.AddEditNoteScreen.route)
+                        },
                         containerColor = MaterialTheme.colorScheme.primary,
                     ) {
                         Icon(
@@ -101,9 +108,15 @@ fun NotesScreen(
             modifier = Modifier.consumeWindowInsets(it),
             contentPadding = it,
         ) {
-            items(noteList) { notes ->
+            items(notes) { notes ->
                 NoteItem(
-                    note = notes
+                    note = notes,
+                    onClick = {
+                        navController.navigate(
+                            Navigation.AddEditNoteScreen.route +
+                                    "?noteId=${notes.id}"
+                        )
+                    }
                 )
             }
         }
@@ -117,7 +130,7 @@ fun NoteItem(
     OutlinedCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(grid_1, bottom = grid_1)
+            .padding(horizontal = grid_1, vertical = grid_0_5)
             .clickable {
                 note.id?.let { onClick(it) }
             },
@@ -138,7 +151,7 @@ fun NoteItem(
                 text = note.title,
                 modifier = Modifier
                     .padding(horizontal = grid_2, vertical = grid_0_5),
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Start,
                 style = MaterialTheme.typography.titleLarge
             )
             Spacer(modifier = Modifier.padding(top = grid_1))
@@ -146,7 +159,7 @@ fun NoteItem(
                 text = note.body,
                 modifier = Modifier
                     .padding(horizontal = grid_2, vertical = grid_0_5),
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Start,
                 color = MaterialTheme.colorScheme.captionColor,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 3
@@ -161,19 +174,6 @@ fun NoteItem(
     showBackground = true
 )
 fun NotesScreenPreview() {
-    NoteComposeTheme {
-        Surface {
-            NotesScreen()
-        }
-    }
-}
-
-@Composable
-@Preview(
-    showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
-)
-fun NotesScreenPreviewDark() {
     NoteComposeTheme {
         Surface {
             NotesScreen()

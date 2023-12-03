@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.atech.note.data.model.Note
+import com.atech.note.data.database.model.Note
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,6 +24,9 @@ interface NoteDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(note: Note)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(notes: List<Note>)
 
     @Delete
     suspend fun delete(note: Note)

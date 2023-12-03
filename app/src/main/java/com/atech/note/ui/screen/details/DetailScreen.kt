@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Archive
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,8 +33,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.atech.note.R
-import com.atech.note.data.model.Note
+import com.atech.note.data.database.model.Note
 import com.atech.note.ui.theme.captionColor
 import com.atech.note.utils.getTimeAgo
 import com.atech.note.utils.noteDemo
@@ -42,10 +45,11 @@ import com.atech.note.utils.noteDemo
 @Composable
 fun DetailScreen(
     modifier: Modifier = Modifier,
-    note: Note
+    navController: NavController = rememberNavController(),
 ) {
     val scrollState = rememberScrollState()
     val scrollBarBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val note = noteDemo
 
     Scaffold(
         modifier =
@@ -59,7 +63,9 @@ fun DetailScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { /*TODO Navigate Up*/ },
+                        onClick = {
+                                  navController.navigateUp()
+                        },
                     )
                     {
                         Icon(
@@ -86,6 +92,12 @@ fun DetailScreen(
                         Icon(
                             imageVector = if (note.isArchived) Icons.Default.Archive else Icons.Outlined.Archive,
                             contentDescription = "Back",
+                        )
+                    }
+                    IconButton(onClick = { /*TODO Handle delete*/ }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = "Delete"
                         )
                     }
                 },
@@ -166,8 +178,7 @@ fun EditTextField(
     Box(modifier) {
         BasicTextField(
             modifier = Modifier
-                .onFocusChanged(onFocusChange)
-                ,
+                .onFocusChanged(onFocusChange),
             value = text,
             onValueChange = onValueChange,
             textStyle = textStyle.copy(
@@ -187,7 +198,5 @@ fun EditTextField(
 
     )
 fun DetailScreenPreview() {
-    DetailScreen(
-        note = noteDemo
-    )
+    DetailScreen()
 }
