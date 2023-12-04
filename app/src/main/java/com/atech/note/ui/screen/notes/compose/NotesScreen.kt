@@ -1,5 +1,6 @@
 package com.atech.note.ui.screen.notes.compose
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.twotone.Archive
 import androidx.compose.material.icons.twotone.Delete
+import androidx.compose.material.icons.twotone.Unarchive
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -109,7 +111,9 @@ fun NotesScreen(
         bottomBar = {
             BottomAppBar(
                 actions = {
-                    IconButton(onClick = { /*TODO navigate to archive*/ }) {
+                    IconButton(onClick = {
+                        navController.navigate(Navigation.ArchiveScreen.route)
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Archive, contentDescription = "Archive"
                         )
@@ -186,6 +190,7 @@ fun NotesScreen(
 fun NoteItem(
     modifier: Modifier = Modifier,
     note: Note,
+    isIconEnable: Boolean = true,
     onClick: (Int) -> Unit = {},
     onIconClick: (Note) -> Unit = {},
     onArchive: (Note) -> Unit = {},
@@ -195,7 +200,7 @@ fun NoteItem(
         onArchive(note)
     }, icon = {
         Icon(
-            imageVector = Icons.TwoTone.Archive,
+            imageVector = if(isIconEnable) Icons.TwoTone.Archive else Icons.TwoTone.Unarchive,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.surface
         )
@@ -247,13 +252,15 @@ fun NoteItem(
                         textAlign = TextAlign.Start,
                         style = MaterialTheme.typography.titleLarge
                     )
-                    IconButton(onClick = {
-                        onIconClick(note)
-                    }) {
+                    IconButton(
+                        enabled = isIconEnable,
+                        onClick = {
+                            onIconClick(note)
+                        }) {
                         Icon(
                             imageVector = if (note.isStared) Icons.Default.Star else Icons.Outlined.StarBorder,
                             contentDescription = "Star",
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = if (isIconEnable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.captionColor
                         )
                     }
                 }
@@ -273,7 +280,8 @@ fun NoteItem(
 
 @Composable
 fun EmptyScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    @StringRes textId: Int = R.string.empty_screen
 ) {
     Column(
         modifier = modifier,
@@ -283,10 +291,10 @@ fun EmptyScreen(
         Image(
             modifier = Modifier.size(200.dp),
             painter = painterResource(id = R.drawable.im_empty),
-            contentDescription = "Empty"
+            contentDescription = stringResource(id = R.string.empty),
         )
         Text(
-            text = "Press + to add note",
+            text = stringResource(id = textId),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )

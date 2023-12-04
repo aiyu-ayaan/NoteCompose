@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.atech.note.ui.screen.archive.compose.ArchiveScreen
 import com.atech.note.ui.screen.details.compose.DetailScreen
 import com.atech.note.ui.screen.notes.compose.NotesScreen
 import com.atech.note.ui.theme.NoteComposeTheme
@@ -34,7 +35,9 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Navigation.NotesScreen.route
                     ) {
-                        composable(route = Navigation.NotesScreen.route) {
+                        composable(
+                            route = Navigation.NotesScreen.route,
+                        ) {
                             NotesScreen(navController = navController)
                         }
                         composable(
@@ -51,6 +54,11 @@ class MainActivity : ComponentActivity() {
                             DetailScreen(
                                 navController = navController
                             )
+                        }
+                        composable(
+                            route = Navigation.ArchiveScreen.route
+                        ) {
+                            ArchiveScreen(navController = navController)
                         }
                     }
                 }

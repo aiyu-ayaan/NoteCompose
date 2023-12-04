@@ -4,4 +4,9 @@
     <string name="enter_body">Body</string>
     <string name="undo">Undo</string>
     <string name="deleted_message">Note Deleted</string>
+    <string name="archive">Archive</string>
+    <string name="back">Back</string>
+    <string name="empty_screen">Press + to add note</string>
+    <string name="empty">Empty</string>
+    <string name="empty_archive">Archive is empty !!</string>
 </resources>

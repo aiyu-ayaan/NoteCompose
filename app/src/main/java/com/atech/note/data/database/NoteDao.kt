@@ -15,7 +15,7 @@ interface NoteDao {
     fun getAllNotes(): Flow<List<Note>>
 
 
-    @Query("SELECT * FROM notes_table WHERE isArchived == 1 ORDER BY isStared , created DESC ")
+    @Query("SELECT * FROM notes_table WHERE isArchived == 1 ORDER BY isStared DESC, created DESC ")
     fun getAllArchivedNotes(): Flow<List<Note>>
 
     @Query("SELECT * FROM notes_table WHERE id = :id")
