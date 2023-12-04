@@ -120,7 +120,6 @@ class DetailViewModel @Inject constructor(
     private fun saveNote(action: () -> Unit) {
         viewModelScope.launch {
             if (!isEdited && !topBarEdited) {
-                _eventFlow.emit(UiEvent.ShowSnackBar("Nothing to save"))
                 action.invoke()
                 return@launch
             }
@@ -137,10 +136,8 @@ class DetailViewModel @Inject constructor(
             )
             try {
                 noteUseCase.insertNote(note = note)
-                _eventFlow.emit(UiEvent.ShowSnackBar("Note saved"))
                 action.invoke()
             } catch (e: Exception) {
-                Log.d(TAG, "saveNote: Called")
                 _eventFlow.emit(UiEvent.ShowSnackBar(e.message ?: "Couldn't save note."))
             }
         }

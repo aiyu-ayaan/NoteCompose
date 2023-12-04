@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
@@ -30,12 +31,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,9 +53,10 @@ import com.atech.note.ui.screen.details.DetailScreenEvent
 import com.atech.note.ui.screen.details.DetailViewModel
 import com.atech.note.ui.screen.details.TextFieldState
 import com.atech.note.ui.theme.captionColor
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun DetailScreen(
     modifier: Modifier = Modifier,
@@ -61,6 +70,9 @@ fun DetailScreen(
     val topAppbarState = viewModel.topBarState.value
     val createOrUpdateAtState = viewModel.createdOrUpdatedAt.value
     val snackBarHostState = remember { SnackbarHostState() }
+    val showKeyboard = remember { viewModel.type == DetailViewModel.Type.ADD }
+    val focusRequester = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { uiEvent ->
@@ -69,6 +81,13 @@ fun DetailScreen(
                     uiEvent.message
                 )
             }
+        }
+    }
+    LaunchedEffect(key1 = focusRequester) {
+        if (showKeyboard) {
+            focusRequester.requestFocus()
+            delay(100)
+            keyboard?.show()
         }
     }
 
@@ -168,12 +187,12 @@ fun DetailScreen(
                 .padding(it)
                 .verticalScroll(scrollState),
         ) {
-
             EditTextField(
                 text = title.text,
                 hint = title.hint,
-                singleLine = false,
+                singleLine = true,
                 isHintVisible = title.isHintVisible,
+                focusRequester = focusRequester,
                 onValueChange = { title ->
                     viewModel.onEvent(DetailScreenEvent.EnteredTitle(title))
                 },
@@ -193,6 +212,9 @@ fun DetailScreen(
                 hint = body.hint,
                 singleLine = false,
                 isHintVisible = body.isHintVisible,
+                keyboardOptions = defaultKeyBoardAction.copy(
+                    imeAction = ImeAction.Default
+                ),
                 onValueChange = { body ->
                     viewModel.onEvent(DetailScreenEvent.EnteredBody(body))
                 },
@@ -235,6 +257,13 @@ private fun handleBackPress(
     else navController.navigateUp()
 }
 
+private val defaultKeyBoardAction = KeyboardOptions(
+    capitalization = KeyboardCapitalization.Sentences,
+    autoCorrect = true,
+    keyboardType = KeyboardType.Text,
+    imeAction = ImeAction.Next
+)
+
 @Composable
 fun EditTextField(
     modifier: Modifier = Modifier,
@@ -243,19 +272,24 @@ fun EditTextField(
     isHintVisible: Boolean = true,
     textStyle: TextStyle = TextStyle(),
     singleLine: Boolean,
+    keyboardOptions: KeyboardOptions = defaultKeyBoardAction,
+    focusRequester: FocusRequester = FocusRequester(),
     onValueChange: (String) -> Unit = {},
     onFocusChange: (FocusState) -> Unit = {}
 ) {
     Box(modifier) {
         BasicTextField(
-            modifier = Modifier.onFocusChanged(onFocusChange),
+            modifier = Modifier
+                .onFocusChanged(onFocusChange)
+                .focusRequester(focusRequester),
             value = text,
             onValueChange = onValueChange,
             textStyle = textStyle.copy(
                 color = MaterialTheme.colorScheme.onSurface,
             ),
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            singleLine = singleLine
+            singleLine = singleLine,
+            keyboardOptions = keyboardOptions
         )
         if (isHintVisible) Text(
             text = hint,
