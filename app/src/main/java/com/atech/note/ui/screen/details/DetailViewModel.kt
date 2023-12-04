@@ -151,7 +151,7 @@ class DetailViewModel @Inject constructor(
             _eventFlow.emit(UiEvent.ShowSnackBar("Something went wrong !!!"))
             return@launch
         }
-        noteUseCase.deleteNote(id = _noteId)
+        noteUseCase.deleteNoteById(id = _noteId)
         _eventFlow.emit(UiEvent.ShowSnackBar("Note deleted"))
         action.invoke()
     }

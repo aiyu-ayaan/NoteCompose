@@ -82,6 +82,8 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     kapt(libs.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    implementation(libs.swipe)
 }
 
 kapt {

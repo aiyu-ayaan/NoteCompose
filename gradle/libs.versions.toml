@@ -18,6 +18,7 @@ roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
 roomRuntime = "2.6.1"
 navigationCompose = "2.7.5"
+swipe = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +43,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
+swipe = { module = "me.saket.swipe:swipe", version.ref = "swipe" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

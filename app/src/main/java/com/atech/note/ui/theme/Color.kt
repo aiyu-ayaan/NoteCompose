@@ -20,6 +20,8 @@ val GreenGray40 = Color(0xFFB2DFDB)
 val LightGreen40 = Color(0xFFA0F3DF)
 
 
-
 val ColorSurfaceLight = Color(0xFFEEFCFD)
 val ColorSurfaceDark = Color(0xFF0A1517)
+
+val SwipeRed = Color(0xFFEE675C)
+val SwipeGreen = Color(0xFF59B972)

@@ -2,4 +2,6 @@
     <string name="app_name">Note</string>
     <string name="enter_title">Title</string>
     <string name="enter_body">Body</string>
+    <string name="undo">Undo</string>
+    <string name="deleted_message">Note Deleted</string>
 </resources>

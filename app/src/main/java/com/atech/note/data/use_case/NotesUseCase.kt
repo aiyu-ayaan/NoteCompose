@@ -10,6 +10,7 @@ data class NotesUseCase @Inject constructor(
     val getArchivedNotes: GetArchivedNotes,
     val getNoteById: GetNoteById,
     val insertNote: InsertNote,
+    val deleteNoteById: DeleteNoteById,
     val deleteNote: DeleteNote
 )
 
@@ -44,10 +45,18 @@ data class InsertNote @Inject constructor(
     }
 }
 
-data class DeleteNote @Inject constructor(
+data class DeleteNoteById @Inject constructor(
     private val dao: NoteDao
 ) {
     suspend operator fun invoke(id: Int) {
-        dao.delete(id)
+        dao.deleteById(id)
+    }
+}
+
+data class DeleteNote @Inject constructor(
+    private val dao: NoteDao
+) {
+    suspend operator fun invoke(note: Note) {
+        dao.delete(note)
     }
 }
