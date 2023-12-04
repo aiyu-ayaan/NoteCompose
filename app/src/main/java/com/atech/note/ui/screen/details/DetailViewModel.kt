@@ -23,7 +23,8 @@ class DetailViewModel @Inject constructor(
     private val noteUseCase: NotesUseCase, private val state: SavedStateHandle
 ) : ViewModel() {
     private val _noteId = state.get<Int>("noteId") ?: -1
-
+    private var isEdited = false
+    private var topBarEdited = false
     private var createdAt: Long = state.get<Long>("createdAt") ?: System.currentTimeMillis()
         set(value) {
             field = value
@@ -91,7 +92,7 @@ class DetailViewModel @Inject constructor(
         when (event) {
             is DetailScreenEvent.EnteredTitle -> _title.value = _title.value.copy(
                 text = event.value
-            )
+            ).also { isEdited = true }
 
             is DetailScreenEvent.ChangeTitleFocus -> _title.value = _title.value.copy(
                 isHintVisible = !event.focus.isFocused && _title.value.text.isBlank()
@@ -99,14 +100,18 @@ class DetailViewModel @Inject constructor(
 
             is DetailScreenEvent.EnteredBody -> _body.value = _body.value.copy(
                 text = event.value
-            )
+            ).also { isEdited = true }
 
             is DetailScreenEvent.ChangeBodyFocus -> _body.value = _body.value.copy(
                 isHintVisible = !event.focus.isFocused && _body.value.text.isBlank()
             )
 
             is DetailScreenEvent.SaveNote -> saveNote(event.action)
-            is DetailScreenEvent.ChangeTopBarState -> _topBarState.value = event.state
+            is DetailScreenEvent.ChangeTopBarState -> {
+                _topBarState.value = event.state
+                topBarEdited = true
+            }
+
             is DetailScreenEvent.DeleteNote -> deleteNote(event.action)
         }
     }
@@ -114,13 +119,20 @@ class DetailViewModel @Inject constructor(
 
     private fun saveNote(action: () -> Unit) {
         viewModelScope.launch {
+            if (!isEdited && !topBarEdited) {
+                _eventFlow.emit(UiEvent.ShowSnackBar("Nothing to save"))
+                action.invoke()
+                return@launch
+            }
             val note = Note(
                 title = _title.value.text,
                 body = _body.value.text,
                 isArchived = _topBarState.value.first,
                 isStared = _topBarState.value.second,
                 created = createdAt,
-                updated = if (type == Type.EDIT) System.currentTimeMillis() else null,
+                updated = if (
+                    type == Type.EDIT && isEdited && !topBarEdited
+                ) System.currentTimeMillis() else null,
                 id = if (_noteId != -1) _noteId else null
             )
             try {
