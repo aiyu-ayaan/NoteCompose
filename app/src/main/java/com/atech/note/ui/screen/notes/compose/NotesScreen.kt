@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.InvertColors
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.twotone.Archive
@@ -115,7 +116,20 @@ fun NotesScreen(
                         navController.navigate(Navigation.ArchiveScreen.route)
                     }) {
                         Icon(
-                            imageVector = Icons.Default.Archive, contentDescription = "Archive"
+                            imageVector = Icons.Default.Archive,
+                            contentDescription = stringResource(
+                                id = R.string.archive
+                            )
+                        )
+                    }
+                    IconButton(onClick = {
+                        navController.navigate(Navigation.ThemeScreen.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.InvertColors,
+                            contentDescription = stringResource(
+                                id = R.string.theme
+                            )
                         )
                     }
                 },
@@ -200,7 +214,7 @@ fun NoteItem(
         onArchive(note)
     }, icon = {
         Icon(
-            imageVector = if(isIconEnable) Icons.TwoTone.Archive else Icons.TwoTone.Unarchive,
+            imageVector = if (isIconEnable) Icons.TwoTone.Archive else Icons.TwoTone.Unarchive,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.surface
         )

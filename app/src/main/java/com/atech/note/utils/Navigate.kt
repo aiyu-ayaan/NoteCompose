@@ -13,10 +13,17 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 
 
+sealed class Navigation(val route: String) {
+    data object NotesScreen : Navigation("notes_screen")
+    data object AddEditNoteScreen : Navigation("add_edit_note_screen")
+    data object ArchiveScreen : Navigation("archive_screen")
+    data object ThemeScreen : Navigation("theme_screen")
+}
+
 const val duration = 300
 const val outOffset = -300
 const val inOffset = 300
-fun NavGraphBuilder.setExit(
+fun NavGraphBuilder.animatedCompose(
     route: String,
     arguments: List<NamedNavArgument> = emptyList(),
     content: @Composable AnimatedVisibilityScope.(NavBackStackEntry) -> Unit
@@ -73,5 +80,5 @@ fun NavGraphBuilder.setExit(
                 )
             )
         }
-        )
-    }
+    )
+}

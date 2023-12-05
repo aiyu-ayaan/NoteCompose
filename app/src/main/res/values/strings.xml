@@ -9,4 +9,9 @@
     <string name="empty_screen">Press + to add note</string>
     <string name="empty">Empty</string>
     <string name="empty_archive">Archive is empty !!</string>
+    <string name="theme">Theme</string>
+    <string name="dynamic_theme">Dynamic Theme</string>
+    <string name="dynamic_theme_des">Apply Colors from wallpaper to the app theme</string>
+    <string name="theme_des">System theme</string>
+    <string name="system">System</string>
 </resources>
